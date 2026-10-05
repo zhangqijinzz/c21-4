@@ -1,6 +1,15 @@
 import { useState } from "react";
-import { Archive, Copy, Database, HardDrive, Trash2 } from "lucide-react";
+import {
+  Archive,
+  Copy,
+  Database,
+  Download,
+  FileUp,
+  HardDrive,
+  Trash2,
+} from "lucide-react";
 import type { LatencyProject } from "../../shared/domain/types";
+import ImportProjectButton from "../exchange/ImportProjectButton";
 
 interface Props {
   projects: LatencyProject[];
@@ -10,6 +19,8 @@ interface Props {
   onChoose: (id: string) => void;
   onDuplicate: () => void;
   onDelete: (id: string) => void;
+  onExport: (id: string) => void;
+  onImport: (text: string) => void;
   onRetrySave: () => void;
 }
 
@@ -21,6 +32,8 @@ export default function ArchivePanel({
   onChoose,
   onDuplicate,
   onDelete,
+  onExport,
+  onImport,
   onRetrySave,
 }: Props) {
   const [pendingDelete, setPendingDelete] = useState<LatencyProject | null>(
@@ -34,6 +47,29 @@ export default function ArchivePanel({
           <h1>本地项目区</h1>
           <p>链路项目和方案快照只保存在当前设备的浏览器中。</p>
         </div>
+        <ImportProjectButton
+          onImportText={(text) => onImport(text)}
+          className="button button-primary"
+          label="导入交换文件"
+          title="从同事分享的 .latency-lab.json 文件导入项目"
+        />
+      </div>
+      <div className="exchange-banner">
+        <div className="exchange-banner-copy">
+          <FileUp size={17} />
+          <div>
+            <strong>同事之间交换编排</strong>
+            <small>
+              导出会把项目连同全部方案快照打包成一份 .latency-lab.json
+              文件；导入时自动重建节点标识并重映射依赖与降级引用。
+            </small>
+          </div>
+        </div>
+        <ImportProjectButton
+          onImportText={(text) => onImport(text)}
+          className="button button-neutral"
+          label="导入项目"
+        />
       </div>
       <div className="storage-overview">
         <div className="storage-graphic">
@@ -108,6 +144,14 @@ export default function ArchivePanel({
               })}
             </span>
             <span className="archive-actions">
+              <button
+                className="icon-button"
+                title={`导出项目 ${project.title}`}
+                aria-label={`导出项目 ${project.title}`}
+                onClick={() => onExport(project.id)}
+              >
+                <Download size={14} />
+              </button>
               <button
                 className="icon-button"
                 title="复制当前项目"

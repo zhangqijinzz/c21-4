@@ -1,5 +1,6 @@
 import { Copy, FolderPlus, PencilLine, Play, Workflow } from "lucide-react";
 import type { LatencyProject } from "../../shared/domain/types";
+import ImportProjectButton from "../exchange/ImportProjectButton";
 
 interface Props {
   projects: LatencyProject[];
@@ -8,6 +9,8 @@ interface Props {
   onCreate: () => void;
   onRename: (name: string) => void;
   onDuplicate: () => void;
+  onExport: () => void;
+  onImport: (text: string) => void;
   onOpenEditor: () => void;
 }
 
@@ -18,6 +21,8 @@ export default function ProjectsPanel({
   onCreate,
   onRename,
   onDuplicate,
+  onExport,
+  onImport,
   onOpenEditor,
 }: Props) {
   const active = projects.find((project) => project.id === activeId);
@@ -29,9 +34,22 @@ export default function ProjectsPanel({
           <h1>链路项目</h1>
           <p>从一条清晰的依赖图开始，逐步收紧首屏预算。</p>
         </div>
-        <button className="button button-primary" onClick={onCreate}>
-          <FolderPlus size={16} /> 新建链路
-        </button>
+        <div className="heading-actions">
+          <ImportProjectButton
+            onImportText={(text) => onImport(text)}
+            className="button button-neutral"
+          />
+          <button
+            className="button button-neutral"
+            onClick={onExport}
+            title="导出当前项目及方案快照"
+          >
+            导出项目
+          </button>
+          <button className="button button-primary" onClick={onCreate}>
+            <FolderPlus size={16} /> 新建链路
+          </button>
+        </div>
       </div>
       <div className="project-workbench">
         <div className="project-list">

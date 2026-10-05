@@ -2230,6 +2230,46 @@ button:disabled {
 .node-card.cycle-conflict .node-led {
   background: #cc725f;
 }
+.heading-actions {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-shrink: 0;
+}
+.exchange-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  margin: -6px 0 26px;
+  padding: 16px 20px;
+  background: linear-gradient(120deg, #f2f6ea, #eef3e9);
+  border: 1px solid #e1e8da;
+  border-radius: 12px;
+}
+.exchange-banner-copy {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  color: #43544a;
+}
+.exchange-banner-copy svg {
+  margin-top: 2px;
+  color: #5d7265;
+}
+.exchange-banner-copy strong {
+  display: block;
+  font-size: 12.5px;
+  color: #25392f;
+}
+.exchange-banner-copy small {
+  display: block;
+  margin-top: 3px;
+  max-width: 720px;
+  font-size: 11px;
+  line-height: 1.7;
+  color: #708076;
+}
 @media (max-width: 1100px) {
   .sidebar {
     width: 210px;

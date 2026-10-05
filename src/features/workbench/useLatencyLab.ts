@@ -28,6 +28,8 @@ import {
 } from "../scenarios/scenarioViewModel";
 import { removeProject, updateProject } from "../projects/projectViewModel";
 import { simulateProject } from "../../shared/domain/simulation";
+import { importProjectIntoDocument } from "../../shared/domain/exchange";
+import { downloadProjectFile } from "../exchange/exchangeFile";
 
 export type LabStatus =
   "loading" | "ready" | "editing" | "simulating" | "error" | "completed";
@@ -180,6 +182,46 @@ export function useLatencyLab() {
     [commit],
   );
 
+  const exportProject = useCallback(
+    (id: string) => {
+      const target =
+        documentRef.current?.projects.find((project) => project.id === id) ??
+        activeProject;
+      if (!target) {
+        setNotice("没有找到可导出的项目。");
+        return;
+      }
+      try {
+        downloadProjectFile(target);
+        setNotice(`已导出「${target.title}」及全部方案快照。`);
+      } catch {
+        setNotice("导出失败，浏览器阻止了文件下载，请重试。");
+      }
+    },
+    [activeProject],
+  );
+
+  const importFromText = useCallback(
+    (text: string) => {
+      const current = documentRef.current;
+      if (!current) return;
+      // 先完成解析、标识重建与校验，成功后才提交，失败不会触碰现有工作区。
+      const outcome = importProjectIntoDocument(current, text);
+      if (!outcome.ok) {
+        setNotice(outcome.message);
+        setStatus("error");
+        return;
+      }
+      commit(outcome.document, "editing");
+      setComparisonIds({ baselineId: "", comparisonId: "" });
+      const tail = outcome.notes.length
+        ? `部分快照做了安全处理：${outcome.notes.join("；")}`
+        : "依赖与降级引用已自动重映射。";
+      setNotice(`已导入「${outcome.project.title}」。${tail}`);
+    },
+    [commit],
+  );
+
   const addNode = useCallback(() => {
     if (activeProject) editProject(addRequestNode(activeProject));
   }, [activeProject, editProject]);
@@ -285,6 +327,8 @@ export function useLatencyLab() {
     renameActive,
     duplicateActive,
     deleteProject,
+    exportProject,
+    importFromText,
     addNode,
     patchNode,
     deleteNode,

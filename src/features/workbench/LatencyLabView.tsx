@@ -135,6 +135,11 @@ export default function LatencyLabView() {
               }}
               onRename={vm.renameActive}
               onDuplicate={vm.duplicateActive}
+              onExport={() => vm.exportProject(active.id)}
+              onImport={(text) => {
+                vm.importFromText(text);
+                vm.setModule("projects");
+              }}
               onOpenEditor={() => vm.setModule("graph")}
             />
           )}
@@ -186,6 +191,11 @@ export default function LatencyLabView() {
               onChoose={vm.chooseProject}
               onDuplicate={vm.duplicateActive}
               onDelete={vm.deleteProject}
+              onExport={vm.exportProject}
+              onImport={(text) => {
+                vm.importFromText(text);
+                vm.setModule("projects");
+              }}
               onRetrySave={vm.retrySave}
             />
           )}

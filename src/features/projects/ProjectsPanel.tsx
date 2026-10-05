@@ -1,4 +1,12 @@
-import { Copy, FolderPlus, PencilLine, Play, Workflow } from "lucide-react";
+import {
+  Copy,
+  Download,
+  FolderPlus,
+  PencilLine,
+  Play,
+  Upload,
+  Workflow,
+} from "lucide-react";
 import type { LatencyProject } from "../../shared/domain/types";
 
 interface Props {
@@ -9,6 +17,8 @@ interface Props {
   onRename: (name: string) => void;
   onDuplicate: () => void;
   onOpenEditor: () => void;
+  onExport: () => void;
+  onImport: () => void;
 }
 
 export default function ProjectsPanel({
@@ -19,6 +29,8 @@ export default function ProjectsPanel({
   onRename,
   onDuplicate,
   onOpenEditor,
+  onExport,
+  onImport,
 }: Props) {
   const active = projects.find((project) => project.id === activeId);
   return (
@@ -29,9 +41,14 @@ export default function ProjectsPanel({
           <h1>链路项目</h1>
           <p>从一条清晰的依赖图开始，逐步收紧首屏预算。</p>
         </div>
-        <button className="button button-primary" onClick={onCreate}>
-          <FolderPlus size={16} /> 新建链路
-        </button>
+        <div className="project-heading-actions">
+          <button className="button button-neutral" onClick={onImport}>
+            <Upload size={15} /> 导入项目
+          </button>
+          <button className="button button-primary" onClick={onCreate}>
+            <FolderPlus size={16} /> 新建链路
+          </button>
+        </div>
       </div>
       <div className="project-workbench">
         <div className="project-list">
@@ -99,6 +116,14 @@ export default function ProjectsPanel({
               <div className="cover-actions">
                 <button
                   className="icon-button light"
+                  title="导出项目"
+                  aria-label="导出项目"
+                  onClick={onExport}
+                >
+                  <Download size={15} />
+                </button>
+                <button
+                  className="icon-button light"
                   title="复制项目"
                   aria-label="复制项目"
                   onClick={onDuplicate}
@@ -114,8 +139,8 @@ export default function ProjectsPanel({
         )}
       </div>
       <div className="project-footnote">
-        <PencilLine size={14} /> 所有修改会自动保存到本地
-        IndexedDB，可离线继续推演。
+        <PencilLine size={14} /> 修改自动保存到本地
+        IndexedDB；导出的项目文件可直接发给同事导入。
       </div>
     </section>
   );

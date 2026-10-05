@@ -465,6 +465,12 @@ button:disabled {
   gap: 18px;
   margin-bottom: 26px;
 }
+.project-heading-actions,
+.archive-heading-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 .eyebrow {
   display: block;
   color: #91a08d;

@@ -136,6 +136,8 @@ export default function LatencyLabView() {
               onRename={vm.renameActive}
               onDuplicate={vm.duplicateActive}
               onOpenEditor={() => vm.setModule("graph")}
+              onExport={vm.exportActiveProject}
+              onImport={() => void vm.importProjectFile()}
             />
           )}
           {vm.module === "graph" && vm.graphAnalysis && (
@@ -187,6 +189,8 @@ export default function LatencyLabView() {
               onDuplicate={vm.duplicateActive}
               onDelete={vm.deleteProject}
               onRetrySave={vm.retrySave}
+              onExport={vm.exportProjectById}
+              onImport={() => void vm.importProjectFile()}
             />
           )}
         </div>

@@ -6,10 +6,13 @@ import type {
   WorkspaceDocument,
 } from "../../shared/domain/types";
 import {
+  addImportedProject,
   createProject,
   duplicateProject,
+  removeProject,
   renameProject,
   selectProject,
+  updateProject,
 } from "../projects/projectViewModel";
 import {
   addRequestNode,
@@ -26,8 +29,15 @@ import {
   saveScenario,
   type ScenarioComparison,
 } from "../scenarios/scenarioViewModel";
-import { removeProject, updateProject } from "../projects/projectViewModel";
 import { simulateProject } from "../../shared/domain/simulation";
+import {
+  importProjectTransfer,
+  TransferFormatError,
+} from "../../shared/domain/transfer";
+import {
+  downloadProjectTransfer,
+  pickAndReadTransferFile,
+} from "../../shared/services/transferFileService";
 
 export type LabStatus =
   "loading" | "ready" | "editing" | "simulating" | "error" | "completed";
@@ -266,6 +276,65 @@ export function useLatencyLab() {
     if (current) commit(current);
   }, [commit]);
 
+  const exportActiveProject = useCallback(() => {
+    if (!activeProject) return;
+    try {
+      downloadProjectTransfer(activeProject);
+      setNotice(`已导出「${activeProject.title}」，可把文件发给同事导入。`);
+    } catch {
+      setNotice("导出失败，请重试或更换浏览器下载目录。");
+    }
+  }, [activeProject]);
+
+  const exportProjectById = useCallback((id: string) => {
+    const project = documentRef.current?.projects.find(
+      (item) => item.id === id,
+    );
+    if (!project) return;
+    try {
+      downloadProjectTransfer(project);
+      setNotice(`已导出「${project.title}」，可把文件发给同事导入。`);
+    } catch {
+      setNotice("导出失败，请重试或更换浏览器下载目录。");
+    }
+  }, []);
+
+  const importProjectFile = useCallback(async (): Promise<boolean> => {
+    const current = documentRef.current;
+    if (!current) return false;
+    let text: string | null;
+    try {
+      text = await pickAndReadTransferFile();
+    } catch {
+      setNotice("文件读取失败，请重新选择导出文件。");
+      return false;
+    }
+    if (text === null) return false; // 用户取消选择
+    try {
+      // 先在内存里完成全部解析与标识重建，成功后才提交，
+      // 任何失败都不会触碰现有工作区。
+      const imported = importProjectTransfer(
+        text,
+        current.projects.map((project) => project.title),
+      );
+      setComparisonIds({ baselineId: "", comparisonId: "" });
+      commit(addImportedProject(current, imported.project), "editing");
+      setNotice(
+        imported.warnings.length
+          ? `已导入「${imported.project.title}」。${imported.warnings.join(" ")}`
+          : `已导入「${imported.project.title}」，可直接继续推演。`,
+      );
+      return true;
+    } catch (error) {
+      const message =
+        error instanceof TransferFormatError
+          ? error.message
+          : "导入失败：文件无法解析，现有项目未受影响。";
+      setNotice(message);
+      return false;
+    }
+  }, [commit]);
+
   return {
     document,
     activeProject,
@@ -300,5 +369,8 @@ export function useLatencyLab() {
     comparisonScenario,
     scenarioComparison,
     selectComparisonScenario,
+    exportActiveProject,
+    exportProjectById,
+    importProjectFile,
   };
 }

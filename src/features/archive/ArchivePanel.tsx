@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { Archive, Copy, Database, HardDrive, Trash2 } from "lucide-react";
+import {
+  Archive,
+  Copy,
+  Database,
+  Download,
+  HardDrive,
+  Trash2,
+  Upload,
+} from "lucide-react";
 import type { LatencyProject } from "../../shared/domain/types";
 
 interface Props {
@@ -11,6 +19,8 @@ interface Props {
   onDuplicate: () => void;
   onDelete: (id: string) => void;
   onRetrySave: () => void;
+  onExport: (id: string) => void;
+  onImport: () => void;
 }
 
 export default function ArchivePanel({
@@ -22,6 +32,8 @@ export default function ArchivePanel({
   onDuplicate,
   onDelete,
   onRetrySave,
+  onExport,
+  onImport,
 }: Props) {
   const [pendingDelete, setPendingDelete] = useState<LatencyProject | null>(
     null,
@@ -33,6 +45,11 @@ export default function ArchivePanel({
           <span className="eyebrow">05 / LOCAL ARCHIVE</span>
           <h1>本地项目区</h1>
           <p>链路项目和方案快照只保存在当前设备的浏览器中。</p>
+        </div>
+        <div className="archive-heading-actions">
+          <button className="button button-neutral" onClick={onImport}>
+            <Upload size={15} /> 导入项目
+          </button>
         </div>
       </div>
       <div className="storage-overview">
@@ -108,6 +125,14 @@ export default function ArchivePanel({
               })}
             </span>
             <span className="archive-actions">
+              <button
+                className="icon-button"
+                title="导出此项目"
+                aria-label={`导出项目 ${project.title}`}
+                onClick={() => onExport(project.id)}
+              >
+                <Download size={14} />
+              </button>
               <button
                 className="icon-button"
                 title="复制当前项目"

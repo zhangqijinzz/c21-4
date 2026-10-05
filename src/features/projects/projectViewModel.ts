@@ -73,6 +73,17 @@ export function duplicateProject(
   };
 }
 
+export function addImportedProject(
+  document: WorkspaceDocument,
+  project: LatencyProject,
+): WorkspaceDocument {
+  return {
+    ...document,
+    activeProjectId: project.id,
+    projects: [project, ...document.projects],
+  };
+}
+
 export function removeProject(
   document: WorkspaceDocument,
   projectId: string,
